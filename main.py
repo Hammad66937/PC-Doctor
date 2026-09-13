@@ -96,7 +96,6 @@ def processes():
     add_text("Running Processes", "PID     NAME                                    CPU       RAM\n" + "-"*75 + "\n" + "\n".join(rows))
 
 def startup_apps():
-  def startup_apps():
     items = []
 
     if os.name == "nt":
@@ -124,16 +123,10 @@ def startup_apps():
                                 name, value, _ = winreg.EnumValue(key, i)
                                 items.append(f"{name}: {value}")
                                 i += 1
-
                             except OSError:
                                 break
 
-                except PermissionError:
-                    items.append(
-                        "A startup registry location could not be read due to permissions."
-                    )
-
-                except FileNotFoundError:
+                except (PermissionError, FileNotFoundError):
                     pass
 
         except Exception as e:
@@ -142,9 +135,13 @@ def startup_apps():
     add_text(
         "Startup Apps",
         "PC DOCTOR — STARTUP ENTRIES\n\n"
-        + ("\n".join(items) if items else
-           "No entries found or this OS is not Windows.")
+        + (
+            "\n".join(items)
+            if items
+            else "No entries found or this OS is not Windows."
+        )
     )
+    
 def generate_report():
     mem = psutil.virtual_memory()
     lines = [
